@@ -40,6 +40,9 @@ public class CountDownActivity extends AppCompatActivity {
             }
 
             public void onFinish() {
+                //TODO: create button that pops up when alarm starts
+                //TODO: create repeating alert until a button is pressed
+
                 long[] pattern = {200,200,200,200,200,200,200,200,200, 200, 200};
                 vibri.vibrate(pattern, -1);
                 Toast.makeText(context ,teatype + " ready!", Toast.LENGTH_LONG).show();
