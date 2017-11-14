@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">TeaTimer</string>
+
+
+    <string name="compose_shortcut_short_label1">short label1</string>
+    <string name="compose_shortcut_long_label1">green tea</string>
+    <string name="compose_disabled_message1">disabled</string>
+
+    <string name="compose_shortcut_short_label2">short label2</string>
+    <string name="compose_shortcut_long_label2">black tea</string>
+    <string name="compose_disabled_message2">disabled</string>
 </resources>

@@ -2,13 +2,18 @@ package com.example.d.teatimer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ShortcutManager;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
+import android.support.v4.content.pm.ShortcutManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 /**
  * Created by d on 11/13/2017.
@@ -17,6 +22,8 @@ import android.widget.Toast;
 public class CountDownActivity extends AppCompatActivity {
 
     TextView mTextField;
+    Long teaTimer;
+    String teatype;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -24,29 +31,36 @@ public class CountDownActivity extends AppCompatActivity {
         setContentView(R.layout.countdown);
         mTextField = findViewById(R.id.tv_counter);
         final Context context = getApplicationContext();
-        Bundle extras = getIntent().getExtras();
-        mTextField.setBackgroundResource(extras.getInt("teaColor"));
-        final Long teatimer = extras.getLong("timerMs");
-        final String teatype = extras.getString("teaType");
+//getting the extra to decide tea type.
+        final int teaExtra = getIntent().getExtras().getInt("teaExtra");
 
-        setTitle(teatype);
+        if (teaExtra == 10) {
+            teaTimer = 180000L;
+            mTextField.setBackgroundResource(R.color.greentea);
+            teatype = "Green Tea";
+            setTitle(teatype);
+
+        } else {
+            teaTimer = 300000L;
+            mTextField.setBackgroundResource(R.color.blacktea);
+            teatype = "Black Tea";
+            setTitle(teatype);
+        }
+
 
         final Vibrator vibri = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-        new CountDownTimer(teatimer, 1000) {
+        new CountDownTimer(teaTimer, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                mTextField.setText("seconds remaining: " + millisUntilFinished / 1000);
+                mTextField.setText("EXTRA " + teaExtra + "\n" + "seconds remaining: " + millisUntilFinished / 1000);
             }
 
             public void onFinish() {
-                //TODO: create button that pops up when alarm starts
-                //TODO: create repeating alert until a button is pressed
-
-                long[] pattern = {300, 400,300, 400,300, 400,300, 400,300, 400};
+                long[] pattern = {300, 400, 300, 400, 300, 400, 300, 400, 300, 400};
                 vibri.vibrate(pattern, -1);
 
-                Toast.makeText(context ,teatype + " ready!", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, teatype + " ready!", Toast.LENGTH_LONG).show();
                 mTextField.setText("done!");
             }
         }.start();
