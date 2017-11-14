@@ -35,7 +35,7 @@ private TextView mTextField;
             @Override
             public void onClick(View view) {
                 Intent countdownIntent= new Intent(MainActivity.this, CountDownActivity.class);
-                countdownIntent.putExtra("timerMs", 10000L);
+                countdownIntent.putExtra("timerMs", 180000L); //180000L);
                 countdownIntent.putExtra("teaType", "Green Tea");
                 countdownIntent.putExtra("teaColor", R.color.greentea);
                 startActivity(countdownIntent);
@@ -46,7 +46,7 @@ private TextView mTextField;
             @Override
             public void onClick(View view) {
                 Intent countdownIntent= new Intent(MainActivity.this, CountDownActivity.class);
-                countdownIntent.putExtra("timerMs", 5000L);
+                countdownIntent.putExtra("timerMs", 300000L);
                 countdownIntent.putExtra("teaType", "Black Tea");
                 countdownIntent.putExtra("teaColor", R.color.blacktea);
                 startActivity(countdownIntent);
