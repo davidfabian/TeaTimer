@@ -1,7 +1,7 @@
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
     <shortcut
         android:enabled="true"
-        android:icon="@drawable/ic_launcher_background"
+        android:icon="@drawable/ic_shortcut_green"
         android:shortcutDisabledMessage="@string/compose_disabled_message1"
         android:shortcutId="green_tea"
         android:shortcutLongLabel="@string/compose_shortcut_long_label1"
@@ -21,7 +21,7 @@
 
     <shortcut
         android:enabled="true"
-        android:icon="@drawable/ic_launcher_background"
+        android:icon="@drawable/ic_shortcut_black"
         android:shortcutDisabledMessage="@string/compose_disabled_message2"
         android:shortcutId="black_tea"
         android:shortcutLongLabel="@string/compose_shortcut_long_label2"

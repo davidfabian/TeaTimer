@@ -1,15 +1,10 @@
 package com.example.d.teatimer;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ShortcutManager;
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
-import android.support.v4.content.pm.ShortcutManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,7 +48,7 @@ public class CountDownActivity extends AppCompatActivity {
         new CountDownTimer(teaTimer, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                mTextField.setText("EXTRA " + teaExtra + "\n" + "seconds remaining: " + millisUntilFinished / 1000);
+                mTextField.setText("The " + teatype + " will be ready in " + millisUntilFinished / 1000 + " seconds!");
             }
 
             public void onFinish() {
