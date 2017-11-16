@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 /**
  * Created by d on 11/13/2017.
+ * the activity to handle countdown and alarms
  */
 
 public class CountDownActivity extends AppCompatActivity {
@@ -53,16 +54,16 @@ public class CountDownActivity extends AppCompatActivity {
 
         //getting the intent extra to decide tea type.
         //setting tea variables (color, brewing time, tea name
-        final int teaExtra = getIntent().getExtras().getInt("teaExtra");
+        final int teaExtra = getIntent().getExtras().getInt("teaExtra", 10);
 
         if (teaExtra == GREEN_TEA) {
-            teaTimer = 3000L;
+            teaTimer = 180000L;
             mRootView.setBackgroundResource(R.color.greentea);
             teatype = getResources().getString(R.string.green_tea);
             setTitle(teatype);
 
         } else if (teaExtra == BLACK_TEA) {
-            teaTimer = 5000L;
+            teaTimer = 300000L;
             mRootView.setBackgroundResource(R.color.blacktea);
             teatype = getResources().getString(R.string.black_tea);
             setTitle(teatype);

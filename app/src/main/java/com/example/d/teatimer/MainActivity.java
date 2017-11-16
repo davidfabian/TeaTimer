@@ -17,7 +17,9 @@ Button blacktea;
         setContentView(R.layout.activity_main);
 
         greentea = findViewById(R.id.green_tea_button);
+        greentea.setText(getResources().getText(R.string.green_tea));
         blacktea = findViewById(R.id.black_tea_button);
+        blacktea.setText(getResources().getText(R.string.black_tea));
 
         // Set a click listener for greentea button
         greentea.setOnClickListener(new View.OnClickListener() {
