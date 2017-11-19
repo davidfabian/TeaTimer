@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.d.teatimer">
+    package="com.givehimacookie.d.teatimer">
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <application
@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name="com.givehimacookie.d.teatimer.MainActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,9 +22,9 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".CountDownActivity"
+            android:name="com.givehimacookie.d.teatimer.CountDownActivity"
             android:label="Countdown!"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.givehimacookie.d.teatimer.MainActivity"
             android:screenOrientation="portrait">
 
         </activity>

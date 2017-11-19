@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.d.teatimer.MainActivity">
+    tools:context="com.givehimacookie.d.teatimer.MainActivity">
 
     <Button
         android:id="@+id/green_tea_button"

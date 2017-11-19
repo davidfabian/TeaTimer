@@ -1,4 +1,5 @@
-package com.example.d.teatimer;
+package com.givehimacookie.d.teatimer;
+
 
 import android.content.Context;
 import android.media.Ringtone;

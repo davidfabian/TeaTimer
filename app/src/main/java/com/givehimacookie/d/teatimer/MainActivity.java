@@ -1,4 +1,4 @@
-package com.example.d.teatimer;
+package com.givehimacookie.d.teatimer;
 
 import android.content.Intent;
 import android.os.Bundle;

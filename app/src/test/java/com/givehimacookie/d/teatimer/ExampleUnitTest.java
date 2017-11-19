@@ -1,8 +1,8 @@
-package com.example.d.teatimer;
+package com.givehimacookie.d.teatimer;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
