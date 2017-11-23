@@ -9,25 +9,21 @@
         android:exported="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:launchMode="singleTask"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.givehimacookie.d.teatimer.MainActivity">
-
+        <activity
+            android:name="com.givehimacookie.d.teatimer.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <meta-data android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
+            <!--<meta-data android:name="android.app.shortcuts"-->
+            <!--android:resource="@xml/shortcuts" />-->
         </activity>
-        <activity
-            android:name="com.givehimacookie.d.teatimer.CountDownActivity"
-            android:label="Countdown!"
-            android:parentActivityName="com.givehimacookie.d.teatimer.MainActivity"
-            android:screenOrientation="portrait">
 
-        </activity>
     </application>
 
 </manifest>
