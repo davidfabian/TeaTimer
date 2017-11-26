@@ -25,9 +25,9 @@ public class MainActivity extends AppCompatActivity {
     final static int BLACK_TEA = 5000;
     final static int NOTIFICATION_ID = 101;
     //change this to real timing before release
-    final static long BREWING_TIME_GREEN = 5000L;
+    final static long BREWING_TIME_GREEN = 180000L;
     //change this to real timing before release
-    final static long BREWING_TIME_BLACK = 4000L;
+    final static long BREWING_TIME_BLACK = 300000L;
     static asyncChrono timerThread;
     long brewingTime = 0L;
     Button greentea;
