@@ -45,12 +45,8 @@
             android:layout_weight="1"
             android:fontFamily="sans-serif-condensed"
             android:gravity="center"
-            android:text="XOUNTDOWN"
             android:textSize="24sp"
-            android:textStyle="bold"
-            tools:text="sampletext"
-
-            />
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/stop_button"

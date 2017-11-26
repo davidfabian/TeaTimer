@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -31,10 +30,9 @@ public class MainActivity extends AppCompatActivity {
     TextView mTvCountDown;
     Button mStopButton;
     Vibrator vibri;
-    long[] pattern = {300, 400};
-    boolean alarmIsOn;
-    boolean CountdownFinished = false;
     Ringtone ringring;
+    long[] pattern = {300, 400};
+    boolean CountdownFinished = false;
     Context context;
 
 
@@ -53,11 +51,14 @@ public class MainActivity extends AppCompatActivity {
         mTvCountDown = findViewById(R.id.tv_counter);
         mStopButton = findViewById(R.id.stop_button);
 
+        /*
+        check if countdown is ongoing, recreate views accordingly.
+         */
         if (CountdownFinished) {
             mTeaSelector.setVisibility(View.INVISIBLE);
             mCountDown.setVisibility(View.VISIBLE);
-            mStopButton.setText(getTitle() + " " + getResources().getString(R.string.ready));
-            mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.ready));
+            mStopButton.setText(getTitle() + getResources().getString(R.string.ready));
+            mTvCountDown.setText(getTitle() + getResources().getString(R.string.ready));
         } else {
             stopAlarm();
         }
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
                 switchToCountDown(BLACK_TEA);
             }
         });
-        //button to reset to default screen and stop asynctask/alarm/countdown
+        //Stop/reset button to reset to default screen and stop asynctask/alarm/countdown
         mStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -109,13 +110,11 @@ public class MainActivity extends AppCompatActivity {
                 setTitle(getResources().getString(R.string.green_tea));
                 mCountDown.setBackgroundColor(getResources().getColor(R.color.greentea));
                 brewingTime = BREWING_TIME_GREEN;
-                Log.e("tea selected:", getString(R.string.green_tea));
                 break;
             case BLACK_TEA:
                 setTitle(getResources().getString(R.string.black_tea));
                 mCountDown.setBackgroundColor(getResources().getColor(R.color.blacktea));
                 brewingTime = BREWING_TIME_BLACK;
-                Log.e("tea selected:", getString(R.string.black_tea));
                 break;
         }
 
@@ -145,30 +144,32 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Log.e("alarm", "over");
     }
 
     void startAlarm() {
         CountdownFinished = true;
         mTeaSelector.setVisibility(View.INVISIBLE);
         mCountDown.setVisibility(View.VISIBLE);
-        mStopButton.setText(getTitle() + " " + getResources().getString(R.string.ready));
-        mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.ready));
+        mStopButton.setText(getTitle() + getResources().getString(R.string.ready));
+        mTvCountDown.setText(getTitle() + getResources().getString(R.string.ready));
         vibri.vibrate(pattern, 0);
         ringring.play();
-        Log.e("ALARM", "ALARM");
     }
 
-
     void updateUI(int secondsleft) {
-        mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.will_be_ready) + " " + secondsleft + " " + getResources().getString(R.string.seconds));
+        mTvCountDown.setText(getTitle() + getResources().getString(R.string.will_be_ready) + secondsleft + " " + getResources().getString(R.string.seconds));
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ringring.stop();
-        timerThread.cancel(true);
+        try {
+            ringring.stop();
+            vibri.cancel();
+            timerThread.cancel(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     class asyncChrono extends AsyncTask<Long, Integer, Boolean> {
@@ -183,12 +184,9 @@ public class MainActivity extends AppCompatActivity {
                     publishProgress((int) ((targets[0] - seconds) / 1000));
                     seconds += 1000L;
                     Thread.sleep(1000L);
-                    Log.e("seconds: ", "" + seconds + CountdownFinished);
-
                 } catch (InterruptedException e) {
                     CountdownFinished = false;
                     e.fillInStackTrace();
-                    Log.e("interruptexeption", "e= " + e);
                 }
             }
             CountdownFinished = true;
@@ -197,22 +195,19 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Boolean properFinished) {
-            Log.e("proper finished? ", " " + properFinished);
             if (properFinished) {
                 startAlarm();
             } else {
-                Log.e("cancelled", "button pressed");
                 stopAlarm();
             }
 
         }
 
         @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            updateUI(values[0]);
+        protected void onProgressUpdate(Integer... secondsLeft) {
+            super.onProgressUpdate(secondsLeft);
+            updateUI(secondsLeft[0]);
         }
-
     }
 }
 

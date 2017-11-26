@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Tea Időzítő</string>
-    <string name="compose_shortcut_short_label1">Zöld</string>
-    <string name="compose_shortcut_long_label1">Zöld Tea</string>
-    <string name="compose_shortcut_short_label2">Fekete</string>
-    <string name="compose_shortcut_long_label2">Fekete Tea</string>
     <string name="green_tea">Zöld Tea</string>
     <string name="black_tea">Fekete Tea</string>
     <string name="cancel_timer">Időzítő Törlése</string>
