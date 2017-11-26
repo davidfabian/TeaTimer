@@ -1,7 +1,9 @@
 package com.givehimacookie.d.teatimer;
 
-import android.app.ProgressDialog;
 import android.content.Context;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -32,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
     long[] pattern = {300, 400};
     boolean alarmIsOn;
     boolean CountdownFinished = false;
-    private ProgressDialog progress;
+    Ringtone ringring;
+    Context context;
 
 
     @Override
@@ -50,8 +53,22 @@ public class MainActivity extends AppCompatActivity {
         mTvCountDown = findViewById(R.id.tv_counter);
         mStopButton = findViewById(R.id.stop_button);
 
+        if (CountdownFinished) {
+            mTeaSelector.setVisibility(View.INVISIBLE);
+            mCountDown.setVisibility(View.VISIBLE);
+            mStopButton.setText(getTitle() + " " + getResources().getString(R.string.ready));
+            mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.ready));
+        } else {
+            stopAlarm();
+        }
+
         //initiate vibrator
         vibri = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+        //get reference to alarm sound
+        context = getBaseContext();
+        Uri notification = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_ALARM);
+        ringring = RingtoneManager.getRingtone(context, notification);
 
         // The code in this method will be executed when the greentea button is clicked on.
         greentea.setOnClickListener(new View.OnClickListener() {
@@ -74,23 +91,15 @@ public class MainActivity extends AppCompatActivity {
         mStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                timerThread.cancel(true);
-                resetToTeaSelection();
+                try {
+                    timerThread.cancel(true);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                stopAlarm();
             }
         });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (CountdownFinished) {
-            mTeaSelector.setVisibility(View.INVISIBLE);
-            mCountDown.setVisibility(View.VISIBLE);
-            mStopButton.setText(getTitle() + " " + getResources().getString(R.string.ready));
-            mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.ready));
-        } else {
-            resetToTeaSelection();
-        }
     }
 
     void switchToCountDown(int teaId) {
@@ -121,29 +130,32 @@ public class MainActivity extends AppCompatActivity {
     void startCounter() {
         timerThread = new asyncChrono();
         timerThread.execute(brewingTime);
+        CountdownFinished = false;
     }
 
-    void resetToTeaSelection() {
+    void stopAlarm() {
+        CountdownFinished = true;
         setTitle(getResources().getString(R.string.app_name));
         mTeaSelector.setVisibility(View.VISIBLE);
         mCountDown.setVisibility(View.INVISIBLE);
         try {
             timerThread.cancel(true);
+            ringring.stop();
             vibri.cancel();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        alarmIsOn = false;
         Log.e("alarm", "over");
     }
 
     void startAlarm() {
-        alarmIsOn = true;
+        CountdownFinished = true;
         mTeaSelector.setVisibility(View.INVISIBLE);
         mCountDown.setVisibility(View.VISIBLE);
         mStopButton.setText(getTitle() + " " + getResources().getString(R.string.ready));
         mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.ready));
         vibri.vibrate(pattern, 0);
+        ringring.play();
         Log.e("ALARM", "ALARM");
     }
 
@@ -155,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        ringring.stop();
         timerThread.cancel(true);
     }
 
@@ -189,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
                 startAlarm();
             } else {
                 Log.e("cancelled", "button pressed");
-                resetToTeaSelection();
+                stopAlarm();
             }
 
         }
