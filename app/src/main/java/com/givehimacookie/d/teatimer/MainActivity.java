@@ -16,24 +16,31 @@ public class MainActivity extends AppCompatActivity {
 
     final static int GREEN_TEA = 3000;
     final static int BLACK_TEA = 5000;
+    //change this to real timing before release
     final static long BREWING_TIME_GREEN = 5000L;
+    //change this to real timing before release
     final static long BREWING_TIME_BLACK = 4000L;
+    static asyncChrono timerThread;
+    long brewingTime = 0L;
     Button greentea;
     Button blacktea;
-    int teaNumberId = 0;
     LinearLayout mTeaSelector;
     LinearLayout mCountDown;
     TextView mTvCountDown;
     Button mStopButton;
     Vibrator vibri;
     long[] pattern = {300, 400};
+    boolean alarmIsOn;
+    boolean CountdownFinished = false;
     private ProgressDialog progress;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //connect views and variables
         greentea = findViewById(R.id.green_tea_button);
         greentea.setText(getResources().getText(R.string.green_tea));
         blacktea = findViewById(R.id.black_tea_button);
@@ -42,39 +49,51 @@ public class MainActivity extends AppCompatActivity {
         mCountDown = findViewById(R.id.ll_countdown);
         mTvCountDown = findViewById(R.id.tv_counter);
         mStopButton = findViewById(R.id.stop_button);
+
         //initiate vibrator
         vibri = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-
-        // Set a click listener for greentea button
+        // The code in this method will be executed when the greentea button is clicked on.
         greentea.setOnClickListener(new View.OnClickListener() {
-            // The code in this method will be executed when the greentea button is clicked on.
+
             @Override
             public void onClick(View view) {
-                teaNumberId = GREEN_TEA;
                 switchToCountDown(GREEN_TEA);
             }
         });
+
+        // The code in this method will be executed when the blacktea button is clicked on.
         blacktea.setOnClickListener(new View.OnClickListener() {
-            // The code in this method will be executed when the greentea button is clicked on.
+
             @Override
             public void onClick(View view) {
-                teaNumberId = BLACK_TEA;
                 switchToCountDown(BLACK_TEA);
             }
         });
+        //button to reset to default screen and stop asynctask/alarm/countdown
         mStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                switchToTeaSelection();
-                stopAlarm();
+                timerThread.cancel(true);
+                resetToTeaSelection();
             }
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (CountdownFinished) {
+            mTeaSelector.setVisibility(View.INVISIBLE);
+            mCountDown.setVisibility(View.VISIBLE);
+            mStopButton.setText(getTitle() + " " + getResources().getString(R.string.ready));
+            mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.ready));
+        } else {
+            resetToTeaSelection();
+        }
+    }
 
     void switchToCountDown(int teaId) {
-        long brewingTime = 0L;
 
         switch (teaId) {
             case GREEN_TEA:
@@ -94,31 +113,49 @@ public class MainActivity extends AppCompatActivity {
         mTeaSelector.setVisibility(View.INVISIBLE);
         mCountDown.setVisibility(View.VISIBLE);
         mStopButton.setText(R.string.cancel_timer);
-        new asyncChrono().execute(brewingTime);
+        startCounter();
+
+
     }
 
-    void switchToTeaSelection() {
+    void startCounter() {
+        timerThread = new asyncChrono();
+        timerThread.execute(brewingTime);
+    }
+
+    void resetToTeaSelection() {
         setTitle(getResources().getString(R.string.app_name));
         mTeaSelector.setVisibility(View.VISIBLE);
         mCountDown.setVisibility(View.INVISIBLE);
+        try {
+            timerThread.cancel(true);
+            vibri.cancel();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        alarmIsOn = false;
+        Log.e("alarm", "over");
     }
 
     void startAlarm() {
+        alarmIsOn = true;
         mTeaSelector.setVisibility(View.INVISIBLE);
         mCountDown.setVisibility(View.VISIBLE);
-        mStopButton.setText(R.string.cancel_timer);
+        mStopButton.setText(getTitle() + " " + getResources().getString(R.string.ready));
+        mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.ready));
         vibri.vibrate(pattern, 0);
         Log.e("ALARM", "ALARM");
     }
 
-    void stopAlarm() {
-
-        vibri.cancel();
-        Log.e("alarm", "over");
-    }
 
     void updateUI(int secondsleft) {
-        mTvCountDown.setText("seconds left: " + secondsleft);
+        mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.will_be_ready) + " " + secondsleft + " " + getResources().getString(R.string.seconds));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        timerThread.cancel(true);
     }
 
     class asyncChrono extends AsyncTask<Long, Integer, Boolean> {
@@ -126,31 +163,43 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Long... targets) {
             long seconds = 0L;
-            while (seconds <= targets[0]) {
+
+            while (seconds <= targets[0] && !isCancelled()) {
                 try {
+                    CountdownFinished = false;
                     publishProgress((int) ((targets[0] - seconds) / 1000));
                     seconds += 1000L;
-                    Thread.sleep(1000);
-                    Log.e("seconds: ", "" + seconds);
+                    Thread.sleep(1000L);
+                    Log.e("seconds: ", "" + seconds + CountdownFinished);
 
                 } catch (InterruptedException e) {
+                    CountdownFinished = false;
                     e.fillInStackTrace();
+                    Log.e("interruptexeption", "e= " + e);
                 }
             }
-            return true;
+            CountdownFinished = true;
+            return CountdownFinished;
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-//            super.onPostExecute(aBoolean);
-            startAlarm();
+        protected void onPostExecute(Boolean properFinished) {
+            Log.e("proper finished? ", " " + properFinished);
+            if (properFinished) {
+                startAlarm();
+            } else {
+                Log.e("cancelled", "button pressed");
+                resetToTeaSelection();
+            }
+
         }
 
         @Override
         protected void onProgressUpdate(Integer... values) {
-//            super.onProgressUpdate(values);
+            super.onProgressUpdate(values);
             updateUI(values[0]);
         }
+
     }
 }
 
