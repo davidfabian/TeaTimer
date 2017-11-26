@@ -1,6 +1,12 @@
 package com.givehimacookie.d.teatimer;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -17,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     final static int GREEN_TEA = 3000;
     final static int BLACK_TEA = 5000;
+    final static int NOTIFICATION_ID = 101;
     //change this to real timing before release
     final static long BREWING_TIME_GREEN = 5000L;
     //change this to real timing before release
@@ -34,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     long[] pattern = {300, 400};
     boolean CountdownFinished = false;
     Context context;
+    BroadcastReceiver mReceiver;
 
 
     @Override
@@ -50,6 +58,15 @@ public class MainActivity extends AppCompatActivity {
         mCountDown = findViewById(R.id.ll_countdown);
         mTvCountDown = findViewById(R.id.tv_counter);
         mStopButton = findViewById(R.id.stop_button);
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                finish();
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("close_app");
+        registerReceiver(mReceiver, filter);
 
         /*
         check if countdown is ongoing, recreate views accordingly.
@@ -57,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
         if (CountdownFinished) {
             mTeaSelector.setVisibility(View.INVISIBLE);
             mCountDown.setVisibility(View.VISIBLE);
-            mStopButton.setText(getTitle() + getResources().getString(R.string.ready));
-            mTvCountDown.setText(getTitle() + getResources().getString(R.string.ready));
+            mStopButton.setText(getTitle() + " " + getResources().getString(R.string.ready));
+            mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.ready));
         } else {
             stopAlarm();
         }
@@ -101,6 +118,8 @@ public class MainActivity extends AppCompatActivity {
                 stopAlarm();
             }
         });
+
+
     }
 
     void switchToCountDown(int teaId) {
@@ -139,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
         mCountDown.setVisibility(View.INVISIBLE);
         try {
             timerThread.cancel(true);
+            cancelNotification(context);
             ringring.stop();
             vibri.cancel();
         } catch (Exception e) {
@@ -148,16 +168,17 @@ public class MainActivity extends AppCompatActivity {
 
     void startAlarm() {
         CountdownFinished = true;
+        createNotification();
         mTeaSelector.setVisibility(View.INVISIBLE);
         mCountDown.setVisibility(View.VISIBLE);
-        mStopButton.setText(getTitle() + getResources().getString(R.string.ready));
-        mTvCountDown.setText(getTitle() + getResources().getString(R.string.ready));
+        mStopButton.setText(getTitle() + " " + getResources().getString(R.string.ready));
+        mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.ready));
         vibri.vibrate(pattern, 0);
         ringring.play();
     }
 
     void updateUI(int secondsleft) {
-        mTvCountDown.setText(getTitle() + getResources().getString(R.string.will_be_ready) + secondsleft + " " + getResources().getString(R.string.seconds));
+        mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.will_be_ready) + " " + secondsleft + " " + getResources().getString(R.string.seconds));
     }
 
     @Override
@@ -166,10 +187,38 @@ public class MainActivity extends AppCompatActivity {
         try {
             ringring.stop();
             vibri.cancel();
+            cancelNotification(context);
             timerThread.cancel(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    void createNotification() {
+        Notification.Builder mBuilder =
+                new Notification.Builder(this)
+                        .setSmallIcon(R.drawable.ic_teacup)
+                        .setContentTitle(getResources().getString(R.string.app_name))
+                        .setContentText(getResources().getText(R.string.ready));
+
+        Intent resultIntent = new Intent("close_app");
+
+        PendingIntent resultPendingIntent = PendingIntent.getBroadcast(this,
+                (int) System.currentTimeMillis(),
+                resultIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setContentIntent(resultPendingIntent);
+
+        NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        mNotifyMgr.notify(NOTIFICATION_ID, mBuilder.build());
+    }
+
+    void cancelNotification(Context ctx) {
+        String ns = Context.NOTIFICATION_SERVICE;
+        NotificationManager nMgr = (NotificationManager) ctx.getSystemService(ns);
+        nMgr.cancel(NOTIFICATION_ID);
     }
 
     class asyncChrono extends AsyncTask<Long, Integer, Boolean> {
