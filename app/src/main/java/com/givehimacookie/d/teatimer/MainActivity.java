@@ -14,8 +14,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -30,8 +32,10 @@ public class MainActivity extends AppCompatActivity {
     final static long BREWING_TIME_BLACK = 300000L;
     static asyncChrono timerThread;
     long brewingTime = 0L;
-    Button greentea;
-    Button blacktea;
+    //    Button greentea;
+    ImageButton greentea;
+    //    Button blacktea;
+    ImageButton blacktea;
     LinearLayout mTeaSelector;
     LinearLayout mCountDown;
     TextView mTvCountDown;
@@ -51,9 +55,9 @@ public class MainActivity extends AppCompatActivity {
 
         //connect views and variables
         greentea = findViewById(R.id.green_tea_button);
-        greentea.setText(getResources().getText(R.string.green_tea));
+//        greentea.setText(getResources().getText(R.string.green_tea));
         blacktea = findViewById(R.id.black_tea_button);
-        blacktea.setText(getResources().getText(R.string.black_tea));
+//        blacktea.setText(getResources().getText(R.string.black_tea));
         mTeaSelector = findViewById(R.id.ll_tea_selector);
         mCountDown = findViewById(R.id.ll_countdown);
         mTvCountDown = findViewById(R.id.tv_counter);
@@ -122,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     void switchToCountDown(int teaId) {
 
         switch (teaId) {
@@ -152,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void stopAlarm() {
+        Log.e("topalarm", "stopalarm");
         CountdownFinished = true;
         setTitle(getResources().getString(R.string.app_name));
         mTeaSelector.setVisibility(View.VISIBLE);
@@ -184,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(mReceiver);
         try {
             ringring.stop();
             vibri.cancel();
