@@ -14,7 +14,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -27,16 +26,14 @@ public class MainActivity extends AppCompatActivity {
     final static int BLACK_TEA = 5000;
     final static int NOTIFICATION_ID = 101;
     //change this to real timing before release
-    final static long BREWING_TIME_GREEN = 180000L;
+    final static long BREWING_TIME_GREEN = 4000L;
     //change this to real timing before release
     final static long BREWING_TIME_BLACK = 300000L;
     final static int COUNTDOWN_UPDATE = 1;
     final static int ALARM_NOTIFICATION = 2;
     static asyncChrono timerThread;
     long brewingTime = 0L;
-    //    Button greentea;
     ImageButton greentea;
-    //    Button blacktea;
     ImageButton blacktea;
     LinearLayout mTeaSelector;
     LinearLayout mCountDown;
@@ -159,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void stopAlarm() {
-        Log.e("topalarm", "stopalarm");
         CountdownFinished = true;
         setTitle(getResources().getString(R.string.app_name));
         mTeaSelector.setVisibility(View.VISIBLE);
@@ -190,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
 
         return formattedtime;
     }
+
     void updateUI(int secondsleft) {
         mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.will_be_ready) + " " + formatTime(secondsleft));
     }
@@ -213,16 +210,9 @@ public class MainActivity extends AppCompatActivity {
                 new Notification.Builder(this)
                         .setSmallIcon(R.drawable.ic_teacup);
 
-        switch (notificationType) {
-            case COUNTDOWN_UPDATE:
-                mBuilder.setContentTitle(getResources().getString(R.string.app_name))
-                        .setContentText(timeLeft);
-                break;
-            case ALARM_NOTIFICATION:
-                mBuilder.setContentTitle(getResources().getString(R.string.app_name))
-                        .setContentText(getResources().getText(R.string.ready));
-                break;
-        }
+        Intent bringToFront = new Intent(this, MainActivity.class);
+        bringToFront.setAction(Intent.ACTION_MAIN);
+        bringToFront.addCategory(Intent.CATEGORY_LAUNCHER);
 
         Intent resultIntent = new Intent("close_app");
 
@@ -231,8 +221,25 @@ public class MainActivity extends AppCompatActivity {
                 resultIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        mBuilder.setContentIntent(resultPendingIntent);
+        PendingIntent updatePendingIntent = PendingIntent.getActivities(this,
+                (int) System.currentTimeMillis(),
+                new Intent[]{bringToFront},
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
+        switch (notificationType) {
+            case COUNTDOWN_UPDATE:
+                mBuilder.setContentTitle(getResources().getString(R.string.app_name))
+                        .setContentText(timeLeft)
+                        .addAction(R.drawable.ic_teacup, getResources().getString(R.string.open_app), updatePendingIntent)
+                        .addAction(R.drawable.ic_cancel, getResources().getString(R.string.cancel_timer), resultPendingIntent);
+                break;
+            case ALARM_NOTIFICATION:
+                mBuilder.setContentTitle(getResources().getString(R.string.app_name))
+                        .setContentText(getResources().getText(R.string.ready))
+                        .addAction(R.drawable.ic_cancel, getResources().getString(R.string.cancel_timer), resultPendingIntent);
+                break;
+        }
+//        mBuilder.setContentIntent(resultPendingIntent);
         mNotifyMgr.notify(NOTIFICATION_ID, mBuilder.build());
     }
 
@@ -270,7 +277,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 stopAlarm();
             }
-
         }
 
         @Override

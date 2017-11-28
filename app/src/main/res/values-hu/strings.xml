@@ -7,4 +7,5 @@
     <string name="will_be_ready">Elkészül</string>
     <string name="seconds">Másodperc Múlva</string>
     <string name="ready">Kész!</string>
+    <string name="open_app">Alkalmazás megnyitása</string>
 </resources>

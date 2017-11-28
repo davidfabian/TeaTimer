@@ -14,8 +14,8 @@ android {
         applicationId 'com.d.teatimer'
         minSdkVersion 22
         targetSdkVersion 25
-        versionCode 9
-        versionName "1.11"
+        versionCode 10
+        versionName "1.12"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
