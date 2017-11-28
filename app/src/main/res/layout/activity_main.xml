@@ -22,7 +22,7 @@
         <!--android:layout_weight="1" />-->
         <ImageButton
             android:id="@+id/green_tea_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/greentea"
@@ -37,7 +37,7 @@
         <!--android:layout_weight="1" />-->
         <ImageButton
             android:id="@+id/black_tea_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/blacktea"
