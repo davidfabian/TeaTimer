@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     final static long BREWING_TIME_GREEN = 180000L;
     //change this to real timing before release
     final static long BREWING_TIME_BLACK = 300000L;
+    final static int COUNTDOWN_UPDATE = 1;
+    final static int ALARM_NOTIFICATION = 2;
     static asyncChrono timerThread;
     long brewingTime = 0L;
     //    Button greentea;
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     boolean CountdownFinished = false;
     Context context;
     BroadcastReceiver mReceiver;
-
+    NotificationManager mNotifyMgr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 stopAlarm();
             }
         });
-
+        mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
     }
 
@@ -174,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
     void startAlarm() {
         CountdownFinished = true;
-        createNotification();
+        createNotification(ALARM_NOTIFICATION, null);
         mTeaSelector.setVisibility(View.INVISIBLE);
         mCountDown.setVisibility(View.VISIBLE);
         mStopButton.setText(getTitle() + " " + getResources().getString(R.string.ready));
@@ -183,8 +185,13 @@ public class MainActivity extends AppCompatActivity {
         ringring.play();
     }
 
+    String formatTime(int secondsleft) {
+        String formattedtime = String.format("%1$02d:%2$02d", secondsleft / 60, secondsleft % 60);
+
+        return formattedtime;
+    }
     void updateUI(int secondsleft) {
-        mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.will_be_ready) + " " + secondsleft + " " + getResources().getString(R.string.seconds));
+        mTvCountDown.setText(getTitle() + " " + getResources().getString(R.string.will_be_ready) + " " + formatTime(secondsleft));
     }
 
     @Override
@@ -201,12 +208,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void createNotification() {
+    void createNotification(int notificationType, String timeLeft) {
         Notification.Builder mBuilder =
                 new Notification.Builder(this)
-                        .setSmallIcon(R.drawable.ic_teacup)
-                        .setContentTitle(getResources().getString(R.string.app_name))
+                        .setSmallIcon(R.drawable.ic_teacup);
+
+        switch (notificationType) {
+            case COUNTDOWN_UPDATE:
+                mBuilder.setContentTitle(getResources().getString(R.string.app_name))
+                        .setContentText(timeLeft);
+                break;
+            case ALARM_NOTIFICATION:
+                mBuilder.setContentTitle(getResources().getString(R.string.app_name))
                         .setContentText(getResources().getText(R.string.ready));
+                break;
+        }
 
         Intent resultIntent = new Intent("close_app");
 
@@ -216,8 +232,6 @@ public class MainActivity extends AppCompatActivity {
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         mBuilder.setContentIntent(resultPendingIntent);
-
-        NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         mNotifyMgr.notify(NOTIFICATION_ID, mBuilder.build());
     }
@@ -263,6 +277,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onProgressUpdate(Integer... secondsLeft) {
             super.onProgressUpdate(secondsLeft);
             updateUI(secondsLeft[0]);
+            createNotification(COUNTDOWN_UPDATE, formatTime(secondsLeft[0]));
         }
     }
 }
